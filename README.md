@@ -5,21 +5,38 @@ Determining the trajectory or direction of travel of a mobile robot or car is es
 
 # Problem statement
 
-Odometry in essense is determining the distance traveled and the direction of travel of the camera at any given time. So for every time instance $t$, we want to determine the pose vector $[x^{t} y^{t} z^{t} \alpha^{t} \beta^{t} \gamma^{t}]$ that describes the position and orientation of the camera. Note that $\alpha^{t}, \beta^{t}, \gamma^{t}$ is in Euler angles, and $x^{t}, y^{t}, z^{t} $ is in Cartesian coordinates. For this problem, we are given the initial known position, and the initial orientation of the camera. They are given as a 3 by 3 rotation matrix $R_{pos}$ and a 3 by 1 translation vector $t_{pos}$. Camera instrinsic such as focal length and the principle point will also be known, and we are assuming a pinhole camera model. 
+Odometry in essense is determining the distance traveled and the direction of travel of the camera at any given time. So for every time instance $t$, we want to determine the pose vector <img src="https://render.githubusercontent.com/render/math?math=[x^{t} y^{t} z^{t} \alpha^{t} \beta^{t} \gamma^{t}]"> that describes the position and orientation of the camera. Note that <img src="https://render.githubusercontent.com/render/math?math=\alpha^{t}, \beta^{t}, \gamma^{t}"> is in Euler angles, and <img src="https://render.githubusercontent.com/render/math?math=x^{t}, y^{t}, z^{t}"> is in Cartesian coordinates. For this problem, we are given the initial known position, and the initial orientation of the camera. They are given as a 3 by 3 rotation matrix <img src="https://render.githubusercontent.com/render/math?math=R_{pos}"> and a 3 by 1 translation vector <img src="https://render.githubusercontent.com/render/math?math=t_{pos}">. Camera instrinsic such as focal length and the principle point will also be known, and we are assuming a pinhole camera model. 
 
 # Algorithm
 
-We will use Nister's Five Point Algorithm for Essential Matrix estimation. The essential matrix is a 3x3 matrix that relates corresponding points in two images, it is similar to the homography matrix that we learned in class. We will also use the FAST(Features from accelerated segment test) algorithm to detect corners and features in the image, it is similar to the ORB features that we learned in class. 
+I used Nister's Five Point Algorithm for Essential Matrix estimation. The essential matrix is a 3x3 matrix that relates corresponding points in two images, it is similar to the homography matrix that we learned in class. I also used the FAST(Features from accelerated segment test) algorithm to detect corners and features in the image, it is similar to the ORB features that we learned in class. 
 
 Here is an outline of the algorithm:
 
-1. Capture two consecutive images at $t$ and $t+1$
-2. Use `cv2.FastFeatureDetector` to detect keypoints in the first image at time $t$
-3. Use LK optical flow `cv2.calcOpticalFlowPyrLK` to determine the corresponding keypoints in the second image at time $t+1$ 
-4. Use Nister's Five Point Algorithm `cv2.findEssentialMat` with RANSAC to find the essential matrix that describe the corresponding point from image $t$ to image $t+1$
-5. Estimate the rotation matrix $R$ and the translation vector $t$ from the essential matrix that was obtained in the last step.
-6. Use the formula $R_{pos}^{t+1} = RR_{pos}^{t}$ and $t_{pos}^{t+1} = t_{pos}^{t} + tR_{pos}$ to determine the new pose vector that describes the position and orientation of the camera
+1. Capture two consecutive images at <img src="https://render.githubusercontent.com/render/math?math=t"> and <img src="https://render.githubusercontent.com/render/math?math=t"> + 1
+2. Use `cv2.FastFeatureDetector` to detect keypoints in the first image at time <img src="https://render.githubusercontent.com/render/math?math=t">
+3. Use LK optical flow `cv2.calcOpticalFlowPyrLK` to determine the corresponding keypoints in the second image at time <img src="https://render.githubusercontent.com/render/math?math=t">+1 
+4. Use Nister's Five Point Algorithm `cv2.findEssentialMat` with RANSAC to find the essential matrix that describe the corresponding point from image $t$ to image <img src="https://render.githubusercontent.com/render/math?math=t">+1 
+5. Estimate the rotation matrix <img src="https://render.githubusercontent.com/render/math?math=R"> and the translation vector <img src="https://render.githubusercontent.com/render/math?math=t"> from the essential matrix that was obtained in the last step.
+6. Use the formula <img src="https://render.githubusercontent.com/render/math?math=R_{pos}^{t+1} = RR_{pos}^{t}"> and <img src="https://render.githubusercontent.com/render/math?math=t_{pos}^{t+1} = t_{pos}^{t}"> + <img src="https://render.githubusercontent.com/render/math?math=tR_{pos}"> to determine the new pose vector that describes the position and orientation of the camera
 
 # Dataset
 
-The dataset used is [KITTI Visual Odometry](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) 
+The dataset used is [KITTI Visual Odometry](http://www.cvlibs.net/datasets/kitti/eval_odometry.php). The dataset provides 10 labeled and 10 unlabeled sequences of urban driving video both in RGB and grayscale. The annotation for each frame includes a 3x4 matrix that contains both the rotation and translation vectors. It also includes calibration files for the camera. All images in the dataset are undistorted.
+
+# Previous work
+
+Most of the algorithm and technique that I used for the project was inspired by Avi Singh's blog post on Monocular Visual Odometry: http://avisingh599.github.io/vision/monocular-vo/ 
+
+He also had a c++ implementation found [here](https://github.com/avisingh599/mono-vo). I wrote all of the code, a lot of it was referenced from OpenCV's official API documentation and tutorial. 
+
+The OpenCV docs and tutorials I used were:
+
+[Optical Flow](https://docs.opencv.org/3.4/d4/dee/tutorial_optical_flow.html)
+
+[Fast Feature Detection](https://docs.opencv.org/3.4/df/d0c/tutorial_py_fast.html)
+
+[Epipolar Geometry](https://docs.opencv.org/3.4/da/de9/tutorial_py_epipolar_geometry.html)
+
+# Results
+
