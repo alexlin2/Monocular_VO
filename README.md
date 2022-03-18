@@ -3,6 +3,9 @@
 
 Determining the trajectory or direction of travel of a mobile robot or car is essential for navigation and and movement. If you have ever driven a car then you would notice a number on your dashboard that tells you how far your car has travel in it's lifespan. This is called an odometer. This information is essential for mechanics to diagnose the health and deterioration of your vehicle and it determines your car's used value on the second hand market. Odometry is also vital for robot navigation, this information is used to determine the state of the robot at any given time. However, odometry is often hard to do without supporting hardware, and inaccurate when using a traditional wheel speed sensor. This project aims to do simple odometry using just a single rgb camera. It solves a complex problem using just software and knowledge of computer vision. 
 
+# Presentation Video
+
+
 # Problem statement
 
 Odometry in essense is determining the distance traveled and the direction of travel of the camera at any given time. So for every time instance $t$, we want to determine the pose vector <img src="https://render.githubusercontent.com/render/math?math=[x^{t} y^{t} z^{t} \alpha^{t} \beta^{t} \gamma^{t}]"> that describes the position and orientation of the camera. Note that <img src="https://render.githubusercontent.com/render/math?math=\alpha^{t}, \beta^{t}, \gamma^{t}"> is in Euler angles, and <img src="https://render.githubusercontent.com/render/math?math=x^{t}, y^{t}, z^{t}"> is in Cartesian coordinates. For this problem, we are given the initial known position, and the initial orientation of the camera. They are given as a 3 by 3 rotation matrix <img src="https://render.githubusercontent.com/render/math?math=R_{pos}"> and a 3 by 1 translation vector <img src="https://render.githubusercontent.com/render/math?math=t_{pos}">. Camera instrinsic such as focal length and the principle point will also be known, and we are assuming a pinhole camera model. 
@@ -39,4 +42,22 @@ The OpenCV docs and tutorials I used were:
 [Epipolar Geometry](https://docs.opencv.org/3.4/da/de9/tutorial_py_epipolar_geometry.html)
 
 # Results
+
+After running the algorithm in urban environment and on highways, there are a few weak sides to the algorithm. Obviously Monocular Odometry is not going to be super accurate because images are planar and it's hard to estimate 3D information from 2D images. Also, the keypoints detected using FAST features are often not that reliable and disappear in consecutive frames. This messes up the RANSAC algorithm and leads to inaccurate essential matrix estimations. 
+
+The metric that I used to determine how good the algorithm was is Mean Squared Error. For trajectories, the MSE represents the average distance that the predicted trajectory is off from the ground truth trajectory.
+
+The **average MSE** I got for urban driving scene was: 51.145
+
+The **average MSE** I got for highway scene was: 30.564
+
+From the results, it seems that Monocular VO works better on highways because it seems like the algorithm tends to fail when the car is taking sharp corners. 
+
+Below are trajectories generated from the algorithm described above, the red path is the ground truth, the green path is the predicted trajectory from the camera using the algorithm. 
+
+This is the trajectory taken from a video of a car driving in an urban environment.
+![example_traj](results/traj.png)
+
+This is the trajectory taken from a video of a car driving on a highway.
+![example_traj](results/highway.png)
 
