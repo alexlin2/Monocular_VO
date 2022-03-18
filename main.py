@@ -5,6 +5,7 @@ from vo import MonocularVO
 
 dataset_img_path = '/home/alexlin/Developer/Monocular_VO/dataset/images/00/image_0/'
 dataset_pose_path = '/home/alexlin/Developer/Monocular_VO/dataset/poses/00.txt'
+dataset_color_path = '/home/alexlin/Developer/Monocular_VO/dataset/color/00/image_2/'
 
 focal = 718.8560
 pp = (607.1928, 185.2157)
@@ -22,10 +23,11 @@ MSE_sum = 0.0
 while(vo.frame_id < len(os.listdir(dataset_img_path))):
     old_frame = cv2.imread(dataset_img_path + str(vo.frame_id).zfill(6)+'.png', 0)
     new_frame = cv2.imread(dataset_img_path + str(vo.frame_id+1).zfill(6)+'.png', 0)
+    color_frame = cv2.imread(dataset_color_path + str(vo.frame_id).zfill(6)+'.png')
 
     if(old_frame is not None and new_frame is not None):
-        cv2.imshow('frame', new_frame)
-        vo.process_frame(old_frame, new_frame)
+        cv2.imshow('frame', color_frame)
+        vo.process_frame(old_frame, new_frame, color_frame)
 
         cv2.imshow('lk_frame', vo.lk_img)
         cv2.imshow('kp_frame', vo.features_img)

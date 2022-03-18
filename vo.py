@@ -1,6 +1,8 @@
 import cv2
 import numpy as np 
 import os
+
+color = np.random.randint(0, 255, (100, 3))
 class MonocularVO():
     
     def __init__(self, focal, pp, detector, lk_params, pose_file_path, start_id):
@@ -36,7 +38,6 @@ class MonocularVO():
     def detect_features(self, frame):
 
         kp = self.detector.detect(frame)
-        cv2.drawKeypoints(self.features_img, kp, None, color=255)
         return np.array([x.pt for x in kp], dtype=np.float32).reshape(-1, 1, 2)
 
     def lk_optical_flow(self, p0, old_frame, current_frame):
@@ -46,13 +47,13 @@ class MonocularVO():
         self.good_old = self.p0[st == 1].reshape(-1, 1, 2)
         self.good_new = self.p1[st == 1].reshape(-1, 1, 2)
 
-        mask = np.zeros_like(old_frame)
+        mask = np.zeros_like(self.lk_img)
 
         for i, (new, old) in enumerate(zip(self.good_new, self.good_old)):
             a, b = new.ravel()
             c, d = old.ravel()
-            mask = cv2.line(mask, (int(a), int(b)), (int(c), int(d)), 255, 2)
-            lk_img = cv2.circle(old_frame, (int(a), int(b)), 5, 255, -1)
+            mask = cv2.line(mask, (int(a), int(b)), (int(c), int(d)), color[i % 100].tolist(), 2)
+            lk_img = cv2.circle(self.lk_img, (int(a), int(b)), 5, color[i % 100].tolist(), -1)
         self.lk_img = cv2.add(lk_img, mask)
         
     def get_absolute_scale(self):
@@ -73,16 +74,19 @@ class MonocularVO():
         
         return np.linalg.norm(true_vect - prev_vect)
 
-    def process_frame(self, old_frame, current_frame):
+    def process_frame(self, old_frame, current_frame, color_frame):
 
-        self.features_img = current_frame.copy()
-        self.lk_img = current_frame.copy()
+        self.features_img = color_frame.copy()
+        self.lk_img = color_frame.copy()
         
         if self.min_features < 2000:
             self.p0 = self.detect_features(old_frame)
 
         
         self.lk_optical_flow(self.p0, old_frame, current_frame)
+
+        kp = self.detector.detect(old_frame)
+        cv2.drawKeypoints(self.features_img, kp, self.features_img, color=(0,0,255))
 
         E, _ = cv2.findEssentialMat(self.good_new, self.good_old, self.focal, self.pp, cv2.RANSAC, 0.999, 1.0, None)
 

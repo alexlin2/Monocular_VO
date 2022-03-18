@@ -4,7 +4,7 @@
 Determining the trajectory or direction of travel of a mobile robot or car is essential for navigation and and movement. If you have ever driven a car then you would notice a number on your dashboard that tells you how far your car has travel in it's lifespan. This is called an odometer. This information is essential for mechanics to diagnose the health and deterioration of your vehicle and it determines your car's used value on the second hand market. Odometry is also vital for robot navigation, this information is used to determine the state of the robot at any given time. However, odometry is often hard to do without supporting hardware, and inaccurate when using a traditional wheel speed sensor. This project aims to do simple odometry using just a single rgb camera. It solves a complex problem using just software and knowledge of computer vision. 
 
 # Presentation Video
-
+[![Everything Is AWESOME](results/maxresdefault.jpg)](https://youtu.be/f-TQwsH0IuI "Everything Is AWESOME")
 
 # Problem statement
 
@@ -19,7 +19,7 @@ Here is an outline of the algorithm:
 1. Capture two consecutive images at <img src="https://render.githubusercontent.com/render/math?math=t"> and <img src="https://render.githubusercontent.com/render/math?math=t"> + 1
 2. Use `cv2.FastFeatureDetector` to detect keypoints in the first image at time <img src="https://render.githubusercontent.com/render/math?math=t">
 3. Use LK optical flow `cv2.calcOpticalFlowPyrLK` to determine the corresponding keypoints in the second image at time <img src="https://render.githubusercontent.com/render/math?math=t">+1 
-4. Use Nister's Five Point Algorithm `cv2.findEssentialMat` with RANSAC to find the essential matrix that describe the corresponding point from image $t$ to image <img src="https://render.githubusercontent.com/render/math?math=t">+1 
+4. Use Nister's Five Point Algorithm `cv2.findEssentialMat` with RANSAC to find the essential matrix that describe the corresponding point from image <img src="https://render.githubusercontent.com/render/math?math=t"> to image <img src="https://render.githubusercontent.com/render/math?math=t">+1 
 5. Estimate the rotation matrix <img src="https://render.githubusercontent.com/render/math?math=R"> and the translation vector <img src="https://render.githubusercontent.com/render/math?math=t"> from the essential matrix that was obtained in the last step.
 6. Use the formula <img src="https://render.githubusercontent.com/render/math?math=R_{pos}^{t+1} = RR_{pos}^{t}"> and <img src="https://render.githubusercontent.com/render/math?math=t_{pos}^{t+1} = t_{pos}^{t}"> + <img src="https://render.githubusercontent.com/render/math?math=tR_{pos}"> to determine the new pose vector that describes the position and orientation of the camera
 
@@ -29,9 +29,9 @@ The dataset used is [KITTI Visual Odometry](http://www.cvlibs.net/datasets/kitti
 
 # Previous work
 
-Most of the algorithm and technique that I used for the project was inspired by Avi Singh's blog post on Monocular Visual Odometry: http://avisingh599.github.io/vision/monocular-vo/ 
+Most of the algorithm and technique that I used for the project was inspired by Avi Singh's blog post on Monocular Visual Odometry: http://avisingh599.github.io/vision/monocular-vo/. He also had a c++ implementation found [here](https://github.com/avisingh599/mono-vo). 
 
-He also had a c++ implementation found [here](https://github.com/avisingh599/mono-vo). I wrote all of the code, a lot of it was referenced from OpenCV's official API documentation and tutorial. 
+I wrote all of the code, a lot of it was referenced from OpenCV's official API documentation and tutorial. 
 
 The OpenCV docs and tutorials I used were:
 
@@ -61,3 +61,8 @@ This is the trajectory taken from a video of a car driving in an urban environme
 This is the trajectory taken from a video of a car driving on a highway.
 ![example_traj](results/highway.png)
 
+# References
+
+1. OpenCV official docs: https://docs.opencv.org/4.x/
+
+2. Avi Singh's blog post on Monocular Visual Odometry https://avisingh599.github.io/vision/monocular-vo/
